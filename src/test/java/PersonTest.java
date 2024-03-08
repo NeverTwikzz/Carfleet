@@ -1,147 +1,90 @@
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PersonTest {
-    //region private attributes
+    private static Person _person;
     private static String _name = "Einstein";
     private static String _firstname = "Albert";
     private static String _phonenumber = "+41793456789";
     private static String _emailaddress = "ae@relativity.org";
+    private static ArrayList<String> _languages;
 
-    private static ArrayList<String> _languages = new ArrayList<String>();
-    private static Person _person;
-    //endregion private attributes
-
-    @BeforeAll
-    public static void beforeAll() {
-        _languages = new ArrayList<String>();
+    @BeforeEach
+    public void setup() {
+        _languages = new ArrayList<>();
         _person = new Person(_name, _firstname, _phonenumber, _emailaddress, _languages);
     }
 
     @Test
     public void allProperties_afterInstantiation_getCorrectValues() {
-        //given
-        //refer to BeforeAll method
-
-        //when
-        //refer to BeforeAll method
-
-        //then
         assertEquals(_name, _person.getName());
+        assertEquals(_firstname, _person.getFirstname());
+        assertEquals(_phonenumber, _person.getPhonenumber());
+        assertEquals(_emailaddress, _person.getEmailaddress());
+        assertEquals(_languages, _person.getLanguages());
     }
 
-    /* Test written in CSharp
-    [Test]
-        public void AllProperties_AfterInstantiation_GetCorrectValues()
-        {
-            //given
+    @Test
+    public void languages_addFirstLanguage_getCorrectUniqueLanguage() {
+        String expectedLanguage = "French";
+        List<String> expectedLanguages = new ArrayList<>(Arrays.asList(expectedLanguage));
 
-            //when
+        _person.setLanguages(expectedLanguages);
 
-            //then
-            Assert.AreEqual(_name, _person.Name);
-            Assert.AreEqual(_firstname, _person.Firstname);
-            Assert.AreEqual(_phonenumber, _person.Phonenumber);
-            Assert.AreEqual(_emailaddress, _person.Emailaddress);
-            Assert.AreEqual(_languages, _person.Languages);
-        }
-
-
-    [Test]
-    public void Languages_AddFirstLanguage_GetCorrectUniqueLanguage()
-    {
-        //given
-        string expectedLanguage = "French";
-        List<string> expectedLanguages = new List<string>() {expectedLanguage };
-
-        //when
-        _person.Languages = expectedLanguages;
-
-        //then
-        Assert.AreEqual(expectedLanguage, _person.Languages[0]);
+        assertEquals(expectedLanguage, _person.getLanguages().get(0));
     }
 
-        [Test]
-    public void Languages_AddMultipleLanguagesAtOnce_GetCorrectListOfLanguages()
-    {
-        //given
-        List<string> expectedLanguages = new List<string>() { "French", "Spanish", "German" };
+    @Test
+    public void languages_addMultipleLanguagesAtOnce_getCorrectListOfLanguages() {
+        List<String> expectedLanguages = Arrays.asList("French", "Spanish", "German");
 
-        //when
-        _person.Languages = expectedLanguages;
+        _person.setLanguages(new ArrayList<>(expectedLanguages));
 
-        //then
-        Assert.AreEqual(expectedLanguages.Count, _person.Languages.Count);
-        foreach(string expectedLanguage in expectedLanguages)
-        {
-            bool languageExists = false;
-            if(_person.Languages.Contains(expectedLanguage))
-            {
-                languageExists = true;
-            }
-            Assert.IsTrue(languageExists);
+        assertEquals(expectedLanguages.size(), _person.getLanguages().size());
+        for (String expectedLanguage : expectedLanguages) {
+            assertTrue(_person.getLanguages().contains(expectedLanguage));
         }
     }
 
-        [Test]
-    public void Languages_AddMultipleLanguagesInExistingLanguagesList_GetCorrectListOfLanguages()
-    {
-        //given
-        List<string> initialLanguages = new List<string>() { "French", "Spanish", "German" };
-        List<string> additionalLanguages = new List<string>() { "Vietnamese"};
-        List<string> expectedLanguages = new List<string>();
-        expectedLanguages.AddRange(initialLanguages);
-        expectedLanguages.AddRange(additionalLanguages);
-        _person.Languages = initialLanguages;
-        Assert.AreEqual(initialLanguages.Count, _person.Languages.Count);
+    @Test
+    public void languages_addMultipleLanguagesInExistingLanguagesList_getCorrectListOfLanguages() {
+        List<String> initialLanguages = Arrays.asList("French", "Spanish", "German");
+        List<String> additionalLanguages = Arrays.asList("Vietnamese");
+        List<String> expectedLanguages = new ArrayList<>(initialLanguages);
+        expectedLanguages.addAll(additionalLanguages);
 
-        //when
-        _person.Languages = additionalLanguages;
+        _person.setLanguages(new ArrayList<>(initialLanguages));
+        assertEquals(initialLanguages.size(), _person.getLanguages().size());
 
-        //then
-        Assert.AreEqual(expectedLanguages.Count, _person.Languages.Count);
-        foreach (string expectedLanguage in expectedLanguages)
-        {
-            bool languageExists = false;
-            if (_person.Languages.Contains(expectedLanguage))
-            {
-                languageExists = true;
-            }
-            Assert.IsTrue(languageExists);
+        _person.setLanguages(new ArrayList<>(additionalLanguages)); // This should add, not replace
+
+        assertEquals(expectedLanguages.size(), _person.getLanguages().size());
+        for (String expectedLanguage : expectedLanguages) {
+            assertTrue(_person.getLanguages().contains(expectedLanguage));
         }
     }
 
-        [Test]
-    public void Languages_AddMultipleLanguagesInExistingLanguagesListWithDuplicate_GetCorrectListOfLanguages()
-    {
-        //given
-        List<string> initialLanguages = new List<string>() { "French", "Spanish", "German" };
-        List<string> additionalLanguages = new List<string>() { "Vietnamese" , "French" };
-        List<string> expectedLanguages = new List<string>();
-        expectedLanguages.AddRange(initialLanguages);
-        expectedLanguages.Add("Vietnamese");
-        _person.Languages = initialLanguages;
-        Assert.AreEqual(initialLanguages.Count, _person.Languages.Count);
+    @Test
+    public void languages_addMultipleLanguagesInExistingLanguagesListWithDuplicate_getCorrectListOfLanguages() {
+        List<String> initialLanguages = Arrays.asList("French", "Spanish", "German");
+        List<String> additionalLanguages = Arrays.asList("Vietnamese", "French"); // "French" is a duplicate
+        List<String> expectedLanguages = new ArrayList<>(initialLanguages);
+        expectedLanguages.add("Vietnamese"); // Only "Vietnamese" should be added, "French" is already there
 
-        //when
-        _person.Languages = additionalLanguages;
+        _person.setLanguages(new ArrayList<>(initialLanguages));
+        assertEquals(initialLanguages.size(), _person.getLanguages().size());
 
-        //then
-        Assert.AreEqual(expectedLanguages.Count, _person.Languages.Count);
-        foreach (string expectedLanguage in expectedLanguages)
-        {
-            bool languageExists = false;
-            if (_person.Languages.Contains(expectedLanguage))
-            {
-                languageExists = true;
-            }
-            Assert.IsTrue(languageExists);
+        _person.setLanguages(new ArrayList<>(additionalLanguages)); // This should add, not replace
+
+        assertEquals(expectedLanguages.size(), _person.getLanguages().size());
+        for (String expectedLanguage : expectedLanguages) {
+            assertTrue(_person.getLanguages().contains(expectedLanguage));
         }
     }
-}
- */
 }
